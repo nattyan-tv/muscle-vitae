@@ -1,42 +1,31 @@
-const CACHE_NAME = 'muscle-vitae-v1';
-const urlsToCache = [
-  './',
-  './index.html',
-  './manifest.json'
-];
+// Minimal Service Worker for PWA compatibility
+// Caching is disabled to prevent issues with Vite's hashed asset filenames
 
-// Install event
+// Install event - no caching
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(urlsToCache);
-      })
-  );
+  // Skip waiting to activate immediately
+  self.skipWaiting();
 });
 
-// Fetch event
+// Fetch event - always fetch from network
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-  );
+  // Always fetch from network, no caching
+  event.respondWith(fetch(event.request));
 });
 
-// Activate event
+// Activate event - clean up any existing caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
+          // Delete all existing caches
+          return caches.delete(cacheName);
         })
       );
+    }).then(() => {
+      // Take control of all clients immediately
+      return self.clients.claim();
     })
   );
 });
