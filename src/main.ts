@@ -20,7 +20,6 @@ const GROUP_TEXTS: { [key: string]: string } = {
   shoulders: "肩",
   cardio: "有酸素",
   core: "体幹",
-  custom: "カスタム",
 };
 
 const STORAGE_KEY = "muscle-vitae-results";
@@ -223,12 +222,10 @@ const handleCustomTrainingSelection = (startButton: HTMLButtonElement, videoCont
   
   // Add options to the select
   Object.entries(GROUP_TEXTS).forEach(([key, value]) => {
-    if (key !== 'custom') {
-      const option = document.createElement("option");
-      option.value = key;
-      option.textContent = value;
-      typeSelect.appendChild(option);
-    }
+    const option = document.createElement("option");
+    option.value = key;
+    option.textContent = value;
+    typeSelect.appendChild(option);
   });
   
   typeInputGroup.appendChild(typeSelect);
