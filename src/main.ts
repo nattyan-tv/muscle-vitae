@@ -41,7 +41,7 @@ const convertDateTime = (date: Date) => {
   return `${y}/${m}/${d} ${hh}:${mm}`;
 };
 
-const formatCumulativeTime = (totalSeconds: number) => {
+const formatCumulativeTime = (totalSeconds: number): HTMLDivElement => {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = totalSeconds % 60;
@@ -67,7 +67,28 @@ const formatCumulativeTime = (totalSeconds: number) => {
   
   const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
   
-  return `<div class="cumulative-title">累計トレーニング時間</div><div class="cumulative-time-value">${timeStr}</div><div class="cumulative-message">${randomEncouragement}</div>`;
+  // Create the container element
+  const container = document.createElement("div");
+  
+  // Create and append the title element
+  const titleElement = document.createElement("div");
+  titleElement.className = "cumulative-title";
+  titleElement.textContent = "累計トレーニング時間";
+  container.appendChild(titleElement);
+  
+  // Create and append the time value element
+  const timeValueElement = document.createElement("div");
+  timeValueElement.className = "cumulative-time-value";
+  timeValueElement.textContent = timeStr;
+  container.appendChild(timeValueElement);
+  
+  // Create and append the message element
+  const messageElement = document.createElement("div");
+  messageElement.className = "cumulative-message";
+  messageElement.textContent = randomEncouragement;
+  container.appendChild(messageElement);
+  
+  return container;
 };
 
 const updateResults = () => {
@@ -125,7 +146,8 @@ const updateResults = () => {
   if (totalElapsed > 0) {
     const cumulativeElement = document.createElement("div");
     cumulativeElement.className = "cumulative-time";
-    cumulativeElement.innerHTML = formatCumulativeTime(totalElapsed);
+    const cumulativeTimeDisplay = formatCumulativeTime(totalElapsed);
+    cumulativeElement.appendChild(cumulativeTimeDisplay);
     resultsContainer.appendChild(cumulativeElement);
   }
 };
@@ -166,23 +188,55 @@ const commandFrameVideo = (command: string) => {
 const handleCustomTrainingSelection = (startButton: HTMLButtonElement, videoContainer: HTMLDivElement) => {
   startButton.disabled = false;
   
-  // Create custom training UI
-  videoContainer.innerHTML = `
-    <div class="custom-training-form">
-      <div class="custom-input-group">
-        <label for="custom-name">メニュー名:</label>
-        <input type="text" id="custom-name" placeholder="例: 腕立て伏せ" />
-      </div>
-      <div class="custom-input-group">
-        <label for="custom-type">種類:</label>
-        <select id="custom-type">
-          ${Object.entries(GROUP_TEXTS).map(([key, value]) => 
-            key !== 'custom' ? `<option value="${key}">${value}</option>` : ''
-          ).join('')}
-        </select>
-      </div>
-    </div>
-  `;
+  // Create custom training UI using DOM elements
+  const customForm = document.createElement("div");
+  customForm.className = "custom-training-form";
+  
+  // Create name input group
+  const nameInputGroup = document.createElement("div");
+  nameInputGroup.className = "custom-input-group";
+  
+  const nameLabel = document.createElement("label");
+  nameLabel.setAttribute("for", "custom-name");
+  nameLabel.textContent = "メニュー名:";
+  nameInputGroup.appendChild(nameLabel);
+  
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.id = "custom-name";
+  nameInput.placeholder = "例: 腕立て伏せ";
+  nameInputGroup.appendChild(nameInput);
+  
+  customForm.appendChild(nameInputGroup);
+  
+  // Create type selection group
+  const typeInputGroup = document.createElement("div");
+  typeInputGroup.className = "custom-input-group";
+  
+  const typeLabel = document.createElement("label");
+  typeLabel.setAttribute("for", "custom-type");
+  typeLabel.textContent = "種類:";
+  typeInputGroup.appendChild(typeLabel);
+  
+  const typeSelect = document.createElement("select");
+  typeSelect.id = "custom-type";
+  
+  // Add options to the select
+  Object.entries(GROUP_TEXTS).forEach(([key, value]) => {
+    if (key !== 'custom') {
+      const option = document.createElement("option");
+      option.value = key;
+      option.textContent = value;
+      typeSelect.appendChild(option);
+    }
+  });
+  
+  typeInputGroup.appendChild(typeSelect);
+  customForm.appendChild(typeInputGroup);
+  
+  // Clear and append the form to video container
+  videoContainer.innerHTML = "";
+  videoContainer.appendChild(customForm);
   
   startButton.onclick = () => {
     const nameInput = document.getElementById("custom-name") as HTMLInputElement;
@@ -245,7 +299,7 @@ const handleRegularTrainingSelection = (selectedMuscleData: any, startButton: HT
     startButton.disabled = false;
 
     if (videoContainer) {
-      videoContainer.innerHTML = ``;
+      videoContainer.innerHTML = "";
 
       if (selectedMuscleData.url) {
         const videoIframe = document.createElement("iframe");
