@@ -177,8 +177,6 @@ const main = () => {
 
           if (selectedMuscleData.url) {
             const videoIframe = document.createElement("iframe");
-            videoIframe.width = "560";
-            videoIframe.height = "315";
             videoIframe.src = selectedMuscleData.url;
             videoIframe.title = "YouTube video player";
             videoIframe.frameBorder = "0";
