@@ -120,7 +120,7 @@ const updateResults = () => {
   // Calculate total elapsed time
   const totalElapsed = results.reduce((sum: number, result: any) => sum + (result.elapse || 0), 0);
   
-  results.forEach((result: { title: string; group: string; date: string; elapse?: number }) => {
+  results.slice().reverse().forEach((result: { title: string; group: string; date: string; elapse?: number }) => {
     const resultElement = document.createElement("div");
     resultElement.className = "result-item";
 
